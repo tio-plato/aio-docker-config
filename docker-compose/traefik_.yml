@@ -1,0 +1,31 @@
+version: "3.9"
+services:
+  traefik:
+    container_name: traefik
+    image: traefik:v2.9.1
+    user: 1000:1000
+    restart: unless-stopped
+    ports:
+      - 80:80
+      - 8080:8080
+      - 443:443
+    environment:
+      - TRAEFIK_API_INSECURE=true
+      - TZ=Europe/Paris
+    volumes:
+      - /home/tio/config/traefik/traefik.yml:/etc/traefik/traefik.yml
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
+    networks:
+      - traefik
+    healthcheck:
+      test: ["curl", "-f", "http://localhost"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+      start_period: 30s
+networks:
+  traefik:
+    name: traefik
+    driver: bridge
